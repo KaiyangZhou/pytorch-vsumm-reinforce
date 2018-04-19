@@ -9,7 +9,7 @@ import numpy as np
 from utils import write_json
 
 parser = argparse.ArgumentParser("Code to create splits in json form")
-parser.add_argument('--dataset', type=str, required=True, help="path to h5 dataset (required)")
+parser.add_argument('-d', '--dataset', type=str, required=True, help="path to h5 dataset (required)")
 parser.add_argument('--save-dir', type=str, default='log', help="path to save output json file (default: 'log/')")
 parser.add_argument('--save-name', type=str, default='splits', help="name to save as, excluding extension (default: 'splits')")
 parser.add_argument('--num-splits', type=int, default=5, help="how many splits to generate (default: 5)")
