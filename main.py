@@ -65,7 +65,7 @@ def main():
     else:
         print("Currently using CPU")
 
-    print("Initializing dataset {}".format(args.dataset))
+    print("Initialize dataset {}".format(args.dataset))
     dataset = h5py.File(args.dataset, 'r')
     num_videos = len(dataset.keys())
     splits = read_json(args.split)
@@ -75,7 +75,7 @@ def main():
     test_keys = split['test_keys']
     print("# total videos {}. # train videos {}. # test videos {}".format(num_videos, len(train_keys), len(test_keys)))
 
-    print("Initializing model")
+    print("Initialize model")
     model = DSN(in_dim=args.input_dim, hid_dim=args.hidden_dim, num_layers=args.num_layers, cell=args.rnn_cell)
     print("Model size: {:.5f}M".format(sum(p.numel() for p in model.parameters())/1000000.0))
 
@@ -96,6 +96,7 @@ def main():
 
     if args.evaluate:
         print("Evaluate only")
+        raise NotImplementedError
         return
 
     print("==> Start training")

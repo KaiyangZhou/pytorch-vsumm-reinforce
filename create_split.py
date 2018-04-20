@@ -10,7 +10,7 @@ from utils import write_json
 
 parser = argparse.ArgumentParser("Code to create splits in json form")
 parser.add_argument('-d', '--dataset', type=str, required=True, help="path to h5 dataset (required)")
-parser.add_argument('--save-dir', type=str, default='log', help="path to save output json file (default: 'log/')")
+parser.add_argument('--save-dir', type=str, default='datasets', help="path to save output json file (default: 'datasets/')")
 parser.add_argument('--save-name', type=str, default='splits', help="name to save as, excluding extension (default: 'splits')")
 parser.add_argument('--num-splits', type=int, default=5, help="how many splits to generate (default: 5)")
 parser.add_argument('--train-percent', type=float, default=0.8, help="percentage of training data (default: 0.8)")
@@ -33,6 +33,7 @@ def split_random(keys, num_videos, num_train):
 
 def create():
     print("==========\nArgs:{}\n==========".format(args))
+    print("Goal: randomly split data for {} times, {:.1%} for training and the rest for testing".format(args.num_splits, args.train_percent))
     print("Loading dataset from {}".format(args.dataset))
     dataset = h5py.File(args.dataset, 'r')
     keys = dataset.keys()
@@ -41,8 +42,6 @@ def create():
     num_test = num_videos - num_train
     print("Split breakdown: # total videos {}. # train videos {}. # test videos {}".format(num_videos, num_train, num_test))
     splits = []
-
-    print("Randomly split data for {} times".format(args.num_splits))
 
     for split_idx in range(args.num_splits):
         train_keys, test_keys = split_random(keys, num_videos, num_train)
