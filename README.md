@@ -20,7 +20,7 @@ Train and test codes are written in `main.py`. To see the detailed arguments, pl
 
 ## How to train
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0
+python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --verbose
 ```
 
 ## How to test
@@ -35,7 +35,19 @@ python parse_log.py -p path_to/log_train.txt
 ```
 The plotted image would look like
 <div align="center">
-  <img src="imgs/epoch_reward.png" alt="epoch_reward" width="50%">
+  <img src="imgs/overall_reward.png" alt="overall_reward" width="50%">
+</div>
+
+If you wanna plot the epoch-reward curve for some specific videos, do
+```
+python parse_json.py -p path_to/rewards.json -i 0
+```
+
+You will obtain images like
+<div align="center">
+  <img src="imgs/epoch_reward_0.png" alt="epoch_reward" width="30%">
+  <img src="imgs/epoch_reward_13.png" alt="epoch_reward" width="30%">
+  <img src="imgs/epoch_reward_15.png" alt="epoch_reward" width="30%">
 </div>
 
 ## Citation
