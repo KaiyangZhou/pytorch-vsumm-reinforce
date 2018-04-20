@@ -17,12 +17,16 @@ from torch.distributions import Bernoulli
 
 from utils import Logger, read_json
 from models import *
+from rewards import compute_reward
+import vsum_tools
 
 parser = argparse.ArgumentParser("Pytorch code for unsupervised video summarization with REINFORCE")
 # Dataset options
 parser.add_argument('-d', '--dataset', type=str, required=True, help="path to h5 dataset (required)")
 parser.add_argument('-s', '--split', type=str, required=True, help="path to split file (required)")
 parser.add_argument('--split-id', type=int, default=0, help="split index (default: 0)")
+parser.add_argument('--eval-metric', type=str, required=True, choices=['tvsum', 'summe'],
+                    help="evaluation metric ['tvsum', 'summe']")
 # Model options
 parser.add_argument('--input-dim', type=int, default=1024, help="input dimension (default: 1024)")
 parser.add_argument('--hidden-dim', type=int, default=256, help="hidden unit dimension of DSN (default: 256)")
@@ -96,47 +100,77 @@ def main():
 
     if args.evaluate:
         print("Evaluate only")
-        raise NotImplementedError
+        evaluate(model, dataset, test_keys, use_gpu)
         return
 
     print("==> Start training")
     start_time = time.time()
+    model.train()
+    baselines = {key: 0. for key in train_keys} # baseline rewards
 
     for epoch in range(start_epoch, args.max_epoch):
         idxs = np.arange(len(train_keys))
-        np.random.shuffle(idxs) # shuffle data indices
+        np.random.shuffle(idxs) # shuffle indices
 
         for idx in idxs:
             key = train_keys[idx]
-            seq = dataset[key]['features'][...]
-            seq = torch.from_numpy(seq).unsqueeze(0) # (1, seq_len, dim)
+            seq = dataset[key]['features'][...] # sequence of features, (seq_len, dim)
+            seq = torch.from_numpy(seq).unsqueeze(0) # input shape (1, seq_len, dim)
             if use_gpu: seq = seq.cuda()
             seq = Variable(seq)
-            probs = model(seq) # (1, seq_len, 1)
+            probs = model(seq) # output shape (1, seq_len, 1)
 
-            cost = 0.
-            cost += args.beta * (probs.mean() - 0.5)**2 # minimize summary length penalty term [Eq.11]
+            cost = args.beta * (probs.mean() - 0.5)**2 # minimize summary length penalty term [Eq.11]
             m = Bernoulli(probs)
             for _ in range(args.num_episode):
                 actions = m.sample()
                 log_probs = m.log_prob(actions)
-                #reward = compute_reward() # TODO
-                reward = 1. # delete later
+                reward = compute_reward(seq, actions, use_gpu=use_gpu)
                 expected_reward = log_probs.mean() * reward
                 cost -= expected_reward # minimize negative expected reward
 
             optimizer.zero_grad()
             cost.backward()
             optimizer.step()
-            print("cost = {}".format(cost.data[0]))
 
         print("Done epoch {}".format(epoch+1))
+
+    evaluate(model, dataset, test_keys, use_gpu)
 
     elapsed = round(time.time() - start_time)
     elapsed = str(datetime.timedelta(seconds=elapsed))
     print("Finished. Total elapsed time (h:m:s): {}".format(elapsed))
 
     dataset.close()
+
+def evaluate(model, dataset, test_keys, use_gpu):
+    print("==> Test")
+    model.eval()
+    fms = []
+    eval_metric = 'avg' if args.eval_metric == 'tvsum' else 'max'
+
+    for key in test_keys:
+        seq = dataset[key]['features'][...]
+        seq = torch.from_numpy(seq).unsqueeze(0)
+        if use_gpu: seq = seq.cuda()
+        seq = Variable(seq)
+        probs = model(seq)
+        probs = probs.data.cpu().squeeze().numpy()
+
+        cps = dataset[key]['change_points'][...]
+        num_frames = dataset[key]['n_frames'][()]
+        nfps = dataset[key]['n_frame_per_seg'][...].tolist()
+        positions = dataset[key]['picks'][...]
+        user_summary = dataset[key]['user_summary'][...]
+
+        machine_summary = vsum_tools.generate_summary(probs, cps, num_frames, nfps, positions)
+        fm, _, _ = vsum_tools.evaluate_summary(machine_summary, user_summary, eval_metric)
+        fms.append(fm)
+
+    mean_fm = np.mean(fms)
+    print("Average F-score {:.1%}".format(mean_fm))
+
+    return mean_fm
 
 if __name__ == '__main__':
     main()
