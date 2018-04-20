@@ -15,7 +15,7 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.distributions import Bernoulli
 
-from utils import Logger, read_json, write_json
+from utils import Logger, read_json, write_json, save_checkpoint
 from models import *
 from rewards import compute_reward
 import vsum_tools
@@ -47,6 +47,7 @@ parser.add_argument('--use-cpu', action='store_true', help="use cpu device")
 parser.add_argument('--evaluate', action='store_true', help="whether to do evaluation only")
 parser.add_argument('--save-dir', type=str, default='log', help="path to save output (default: 'log/')")
 parser.add_argument('--resume', type=str, default='', help="path to resume file")
+parser.add_argument('--verbose', action='store_true', help="whether to show detailed test results")
 
 args = parser.parse_args()
 
@@ -90,8 +91,7 @@ def main():
     if args.resume:
         print("Loading checkpoint from '{}'".format(args.resume))
         checkpoint = torch.load(args.resume)
-        model.load_state_dict(checkpoint['state_dict'])
-        start_epoch = checkpoint['epoch']
+        model.load_state_dict(checkpoint)
     else:
         start_epoch = 0
 
@@ -149,6 +149,11 @@ def main():
     elapsed = str(datetime.timedelta(seconds=elapsed))
     print("Finished. Total elapsed time (h:m:s): {}".format(elapsed))
 
+    model_state_dict = model.module.state_dict() if use_gpu else model.state_dict()
+    model_save_path = osp.join(args.save_dir, 'model_epoch' + str(args.max_epoch) + '.pth.tar')
+    save_checkpoint(model_state_dict, model_save_path)
+    print("Model saved to {}".format(model_save_path))
+
     dataset.close()
 
 def evaluate(model, dataset, test_keys, use_gpu):
@@ -157,7 +162,7 @@ def evaluate(model, dataset, test_keys, use_gpu):
     fms = []
     eval_metric = 'avg' if args.metric == 'tvsum' else 'max'
 
-    for key in test_keys:
+    for key_idx, key in enumerate(test_keys):
         seq = dataset[key]['features'][...]
         seq = torch.from_numpy(seq).unsqueeze(0)
         if use_gpu: seq = seq.cuda()
@@ -174,6 +179,9 @@ def evaluate(model, dataset, test_keys, use_gpu):
         machine_summary = vsum_tools.generate_summary(probs, cps, num_frames, nfps, positions)
         fm, _, _ = vsum_tools.evaluate_summary(machine_summary, user_summary, eval_metric)
         fms.append(fm)
+
+        if args.verbose:
+            print("#{} video {} F-score {:.1%}".format(key_idx+1, key, fm))
 
     mean_fm = np.mean(fms)
     print("Average F-score {:.1%}".format(mean_fm))
