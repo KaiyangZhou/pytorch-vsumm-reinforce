@@ -7,6 +7,7 @@ import h5py
 import time
 import datetime
 import numpy as np
+from tabulate import tabulate
 
 import torch
 import torch.nn as nn
@@ -162,6 +163,8 @@ def evaluate(model, dataset, test_keys, use_gpu):
     fms = []
     eval_metric = 'avg' if args.metric == 'tvsum' else 'max'
 
+    if args.verbose: table = [["No.", "Video", "F-score"]]
+
     for key_idx, key in enumerate(test_keys):
         seq = dataset[key]['features'][...]
         seq = torch.from_numpy(seq).unsqueeze(0)
@@ -181,7 +184,10 @@ def evaluate(model, dataset, test_keys, use_gpu):
         fms.append(fm)
 
         if args.verbose:
-            print("#{} video {} F-score {:.1%}".format(key_idx+1, key, fm))
+            table.append([key_idx+1, key, "{:.1%}".format(fm)])
+
+    if args.verbose:
+        print(tabulate(table))
 
     mean_fm = np.mean(fms)
     print("Average F-score {:.1%}".format(mean_fm))
