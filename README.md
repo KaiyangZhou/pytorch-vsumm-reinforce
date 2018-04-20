@@ -1,6 +1,8 @@
 # pytorch-vsumm-reinforce
 This repo contains the Pytorch implementation of the AAAI'18 paper - [Deep Reinforcement Learning for Unsupervised Video Summarization with Diversity-Representativeness Reward](https://arxiv.org/abs/1801.00054). The original Theano implementation can be found [here](https://github.com/KaiyangZhou/vsumm-reinforce).
 
+The main requirements are [pytorch](http://pytorch.org/) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
+
 ## Get started
 1. Download preprocessed datasets
 ```bash
@@ -49,6 +51,10 @@ You will obtain images like
   <img src="imgs/epoch_reward_13.png" alt="epoch_reward" width="30%">
   <img src="imgs/epoch_reward_15.png" alt="epoch_reward" width="30%">
 </div>
+
+
+## How to use your own data
+We preprocess data by extracting image features for videos and save them to `h5` file. The file format looks like [this](https://github.com/KaiyangZhou/vsumm-reinforce/issues/1#issuecomment-363492711). After that, you can make split via `create_split.py`. If you wanna train policy network using the entire dataset, just do `train_keys = dataset.keys()`. [Here](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce/blob/master/main.py#L75) is the code where we initialize dataset. If you have any problems, feel free to contact me by email or raise an `issue`.
 
 ## Citation
 ```
