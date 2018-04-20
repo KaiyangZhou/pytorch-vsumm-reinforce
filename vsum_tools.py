@@ -66,6 +66,8 @@ def evaluate_summary(machine_summary, user_summary, eval_metric='avg'):
     --------------------------------
     machine_summary and user_summary should be binary vectors of ndarray type.
     eval_metric = {'avg', 'max'}
+    'avg' averages results of comparing multiple human summaries.
+    'max' takes the maximum (best) out of multiple comparisons.
     """
     machine_summary = machine_summary.astype(np.float32)
     user_summary = user_summary.astype(np.float32)
