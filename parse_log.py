@@ -4,6 +4,14 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 
+"""
+Parse log file (.txt) to extract rewards.
+
+How to use:
+# image will be saved in path: blah_blah_blah
+$ python parse_log.py -log blah_blah_blah/log_train.txt
+"""
+
 parser = argparse.ArgumentParser()
 parser.add_argument('-log', type=str, help="path to log.txt; output saved to the same dir")
 args = parser.parse_args()
