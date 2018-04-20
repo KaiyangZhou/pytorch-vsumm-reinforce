@@ -16,6 +16,8 @@ python create_split.py -d datasets/eccv16_dataset_summe_google_pool5.h5 --save-d
 ```
 As a result, the dataset is randomly split for 5 times, which are saved as json file.
 
+Train and test codes are written in `main.py`. To see the detailed arguments, please do `python main.py -h`.
+
 ## How to train
 ```bash
 python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0
@@ -23,10 +25,18 @@ python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summ
 
 ## How to test
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar
+python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar --verbose
 ```
 
 ## Plot
+We provide codes to plot the rewards obtained at each epoch. Use `parse_log.py` to plot the average rewards
+```bash
+python parse_log.py -p path_to/log_train.txt
+```
+The plotted image would look like
+<div align="center">
+  <img src="imgs/epoch_reward.png" alt="epoch_reward" width="50%">
+</div>
 
 ## Citation
 ```
