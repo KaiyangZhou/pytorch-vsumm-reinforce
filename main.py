@@ -15,7 +15,7 @@ from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.distributions import Bernoulli
 
-from utils import Logger, read_json
+from utils import Logger, read_json, write_json
 from models import *
 from rewards import compute_reward
 import vsum_tools
@@ -107,6 +107,7 @@ def main():
     start_time = time.time()
     model.train()
     baselines = {key: 0. for key in train_keys} # baseline rewards for videos
+    reward_writers = {key: [] for key in train_keys} # record reward changes for each video
 
     for epoch in range(start_epoch, args.max_epoch):
         idxs = np.arange(len(train_keys))
@@ -122,22 +123,26 @@ def main():
 
             cost = args.beta * (probs.mean() - 0.5)**2 # minimize summary length penalty term [Eq.11]
             m = Bernoulli(probs)
-            rewards = []
+            epis_rewards = []
             for _ in range(args.num_episode):
                 actions = m.sample()
                 log_probs = m.log_prob(actions)
                 reward = compute_reward(seq, actions, use_gpu=use_gpu)
                 expected_reward = log_probs.mean() * (reward - baselines[key])
                 cost -= expected_reward # minimize negative expected reward
-                rewards.append(reward)
+                epis_rewards.append(reward)
 
             optimizer.zero_grad()
             cost.backward()
+            torch.nn.utils.clip_grad_norm(model.parameters(), 5.0)
             optimizer.step()
-            baselines[key] = 0.9 * baselines[key] + 0.1 * np.mean(rewards) # update baseline reward using moving average
+            baselines[key] = 0.9 * baselines[key] + 0.1 * np.mean(epis_rewards) # update baseline reward via moving average
+            reward_writers[key].append(np.mean(epis_rewards))
 
-        print("Done epoch {}".format(epoch+1))
+        epoch_reward = np.mean([reward_writers[key][epoch] for key in train_keys])
+        print("epoch {}/{}\t reward {}\t".format(epoch+1, args.max_epoch, epoch_reward))
 
+    write_json(reward_writers, osp.join(args.save_dir, 'rewards.json'))
     evaluate(model, dataset, test_keys, use_gpu)
 
     elapsed = round(time.time() - start_time)
