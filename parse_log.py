@@ -38,5 +38,6 @@ with open(args.path, 'r') as f:
 plt.plot(rewards)
 plt.xlabel('epoch')
 plt.ylabel('reward')
-plt.savefig(osp.join(osp.dirname(args.path), 'epoch_reward.png'))
+plt.title("Overall rewards")
+plt.savefig(osp.join(osp.dirname(args.path), 'overall_reward.png'))
 plt.close()

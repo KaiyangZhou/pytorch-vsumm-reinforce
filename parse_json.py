@@ -29,5 +29,6 @@ rewards = reward_writers[key]
 plt.plot(rewards)
 plt.xlabel('epoch')
 plt.ylabel('reward')
-plt.savefig(osp.join(osp.dirname(args.path), 'epoch_reward_' + key + '.png'))
+plt.title("{}".format(key))
+plt.savefig(osp.join(osp.dirname(args.path), 'epoch_reward_' + str(args.idx) + '.png'))
 plt.close()
