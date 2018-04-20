@@ -106,7 +106,7 @@ def main():
     print("==> Start training")
     start_time = time.time()
     model.train()
-    baselines = {key: 0. for key in train_keys} # baseline rewards
+    baselines = {key: 0. for key in train_keys} # baseline rewards for videos
 
     for epoch in range(start_epoch, args.max_epoch):
         idxs = np.arange(len(train_keys))
@@ -122,16 +122,19 @@ def main():
 
             cost = args.beta * (probs.mean() - 0.5)**2 # minimize summary length penalty term [Eq.11]
             m = Bernoulli(probs)
+            rewards = []
             for _ in range(args.num_episode):
                 actions = m.sample()
                 log_probs = m.log_prob(actions)
                 reward = compute_reward(seq, actions, use_gpu=use_gpu)
-                expected_reward = log_probs.mean() * reward
+                expected_reward = log_probs.mean() * (reward - baselines[key])
                 cost -= expected_reward # minimize negative expected reward
+                rewards.append(reward)
 
             optimizer.zero_grad()
             cost.backward()
             optimizer.step()
+            baselines[key] = 0.9 * baselines[key] + 0.1 * np.mean(rewards) # update baseline reward using moving average
 
         print("Done epoch {}".format(epoch+1))
 
