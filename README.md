@@ -11,18 +11,18 @@ wget http://www.eecs.qmul.ac.uk/~kz303/vsumm-reinforce/datasets.tar.gz
 tar -xvzf datasets.tar.gz
 ```
 2. Make splits
-```python
+```bash
 python create_split.py -d datasets/eccv16_dataset_summe_google_pool5.h5 --save-dir datasets --save-name summe_splits  --num-splits 5
 ```
 As a result, the dataset is randomly split for 5 times, which are saved as json file.
 
 ## How to train
-```python
+```bash
 python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0
 ```
 
 ## How to test
-```python
+```bash
 python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar
 ```
 
