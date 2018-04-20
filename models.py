@@ -18,10 +18,3 @@ class DSN(nn.Module):
         h, _ = self.rnn(x)
         p = F.sigmoid(self.fc(h))
         return p
-
-if __name__ == '__main__':
-    from torch.autograd import Variable
-    dsn = DSN()
-    x = Variable(torch.rand(1, 10, 1024))
-    out = dsn(x)
-    print out.size()
