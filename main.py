@@ -25,7 +25,7 @@ parser = argparse.ArgumentParser("Pytorch code for unsupervised video summarizat
 parser.add_argument('-d', '--dataset', type=str, required=True, help="path to h5 dataset (required)")
 parser.add_argument('-s', '--split', type=str, required=True, help="path to split file (required)")
 parser.add_argument('--split-id', type=int, default=0, help="split index (default: 0)")
-parser.add_argument('--eval-metric', type=str, required=True, choices=['tvsum', 'summe'],
+parser.add_argument('-m', '--metric', type=str, required=True, choices=['tvsum', 'summe'],
                     help="evaluation metric ['tvsum', 'summe']")
 # Model options
 parser.add_argument('--input-dim', type=int, default=1024, help="input dimension (default: 1024)")
@@ -155,7 +155,7 @@ def evaluate(model, dataset, test_keys, use_gpu):
     print("==> Test")
     model.eval()
     fms = []
-    eval_metric = 'avg' if args.eval_metric == 'tvsum' else 'max'
+    eval_metric = 'avg' if args.metric == 'tvsum' else 'max'
 
     for key in test_keys:
         seq = dataset[key]['features'][...]
