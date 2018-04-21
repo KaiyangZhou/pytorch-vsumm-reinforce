@@ -1,6 +1,10 @@
 # pytorch-vsumm-reinforce
 This repo contains the Pytorch implementation of the AAAI'18 paper - [Deep Reinforcement Learning for Unsupervised Video Summarization with Diversity-Representativeness Reward](https://arxiv.org/abs/1801.00054). The original Theano implementation can be found [here](https://github.com/KaiyangZhou/vsumm-reinforce).
 
+<div align="center">
+  <img src="imgs/pipeline.jpg" alt="train" width="80%">
+</div>
+
 The main requirements are [pytorch](http://pytorch.org/) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
 
 ## Get started
