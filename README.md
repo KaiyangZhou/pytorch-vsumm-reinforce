@@ -31,7 +31,12 @@ python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summ
 
 ## How to test
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar --verbose
+python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar --verbose --save-results
+```
+
+If argument `--save-results` is enabled, output results will be saved to `results.h5` under the same folder specified by `--save-dir`. To visualize the score-vs-gtscore, simple do
+```bash
+python visualize_results.py -p path_to/result.h5
 ```
 
 ## Plot
