@@ -49,6 +49,7 @@ parser.add_argument('--evaluate', action='store_true', help="whether to do evalu
 parser.add_argument('--save-dir', type=str, default='log', help="path to save output (default: 'log/')")
 parser.add_argument('--resume', type=str, default='', help="path to resume file")
 parser.add_argument('--verbose', action='store_true', help="whether to show detailed test results")
+parser.add_argument('--save-results', action='store_true', help="whether to save output results")
 
 args = parser.parse_args()
 
@@ -165,6 +166,9 @@ def evaluate(model, dataset, test_keys, use_gpu):
 
     if args.verbose: table = [["No.", "Video", "F-score"]]
 
+    if args.save_results:
+        h5_res = h5py.File(osp.join(args.save_dir, 'result.h5'), 'w')
+
     for key_idx, key in enumerate(test_keys):
         seq = dataset[key]['features'][...]
         seq = torch.from_numpy(seq).unsqueeze(0)
@@ -186,8 +190,16 @@ def evaluate(model, dataset, test_keys, use_gpu):
         if args.verbose:
             table.append([key_idx+1, key, "{:.1%}".format(fm)])
 
+        if args.save_results:
+            h5_res.create_dataset(key + '/score', data=probs)
+            h5_res.create_dataset(key + '/machine_summary', data=machine_summary)
+            h5_res.create_dataset(key + '/gtscore', data=dataset[key]['gtscore'][...])
+            h5_res.create_dataset(key + '/fm', data=fm)
+
     if args.verbose:
         print(tabulate(table))
+
+    if args.save_results: h5_res.close()
 
     mean_fm = np.mean(fms)
     print("Average F-score {:.1%}".format(mean_fm))
