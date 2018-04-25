@@ -5,7 +5,7 @@ This repo contains the Pytorch implementation of the AAAI'18 paper - [Deep Reinf
   <img src="imgs/pipeline.jpg" alt="train" width="80%">
 </div>
 
-The main requirements are [pytorch](http://pytorch.org/) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
+The main requirements are [pytorch](http://pytorch.org/) (v0.3.1) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
 
 ## Get started
 1. Download preprocessed datasets
