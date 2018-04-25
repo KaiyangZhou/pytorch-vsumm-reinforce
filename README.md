@@ -5,7 +5,7 @@ This repo contains the Pytorch implementation of the AAAI'18 paper - [Deep Reinf
   <img src="imgs/pipeline.jpg" alt="train" width="80%">
 </div>
 
-The main requirements are [pytorch](http://pytorch.org/) (v0.3.1) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
+The main requirements are [pytorch](http://pytorch.org/) (v0.3.1, will upgrade to v0.4.0 soon) and `python 2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
 
 ## Get started
 1. Download preprocessed datasets
@@ -50,7 +50,7 @@ The plotted image would look like
 </div>
 
 If you wanna plot the epoch-reward curve for some specific videos, do
-```
+```bash
 python parse_json.py -p path_to/rewards.json -i 0
 ```
 
@@ -62,6 +62,13 @@ You will obtain images like
 </div>
 
 If you prefer to visualize the epoch-reward curve for all training videos, try `parse_json.sh`. Modify the code according to your purpose.
+
+## Visualize summary
+You can use `summary2video.py` to transform the binary `machine_summary` to real summary video. You need to have a directory containing video frames. The code will automatically write summary frames to a video where the frame rate can be controlled. Use the following command to generate a `.mp4` video
+```bash
+python summary2video.py -p path_to/result.h5 -d path_to/video_frames -i 0 --fps 30 --save-dir log --save-name summary.mp4
+```
+Please remember to specify the naming format of your video frames on this [line](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce/blob/master/summary2video.py#L22).
 
 ## How to use your own data
 We preprocess data by extracting image features for videos and save them to `h5` file. The file format looks like [this](https://github.com/KaiyangZhou/vsumm-reinforce/issues/1#issuecomment-363492711). After that, you can make split via `create_split.py`. If you wanna train policy network using the entire dataset, just do `train_keys = dataset.keys()`. [Here](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce/blob/master/main.py#L75) is the code where we initialize dataset. If you have any problems, feel free to contact me by email or raise an `issue`.
