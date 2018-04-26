@@ -12,7 +12,6 @@ from tabulate import tabulate
 import torch
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
-from torch.autograd import Variable
 from torch.optim import lr_scheduler
 from torch.distributions import Bernoulli
 
@@ -120,7 +119,6 @@ def main():
             seq = dataset[key]['features'][...] # sequence of features, (seq_len, dim)
             seq = torch.from_numpy(seq).unsqueeze(0) # input shape (1, seq_len, dim)
             if use_gpu: seq = seq.cuda()
-            seq = Variable(seq)
             probs = model(seq) # output shape (1, seq_len, 1)
 
             cost = args.beta * (probs.mean() - 0.5)**2 # minimize summary length penalty term [Eq.11]
@@ -132,11 +130,11 @@ def main():
                 reward = compute_reward(seq, actions, use_gpu=use_gpu)
                 expected_reward = log_probs.mean() * (reward - baselines[key])
                 cost -= expected_reward # minimize negative expected reward
-                epis_rewards.append(reward)
+                epis_rewards.append(reward.item())
 
             optimizer.zero_grad()
             cost.backward()
-            torch.nn.utils.clip_grad_norm(model.parameters(), 5.0)
+            torch.nn.utils.clip_grad_norm_(model.parameters(), 5.0)
             optimizer.step()
             baselines[key] = 0.9 * baselines[key] + 0.1 * np.mean(epis_rewards) # update baseline reward via moving average
             reward_writers[key].append(np.mean(epis_rewards))
@@ -160,41 +158,41 @@ def main():
 
 def evaluate(model, dataset, test_keys, use_gpu):
     print("==> Test")
-    model.eval()
-    fms = []
-    eval_metric = 'avg' if args.metric == 'tvsum' else 'max'
+    with torch.no_grad():
+        model.eval()
+        fms = []
+        eval_metric = 'avg' if args.metric == 'tvsum' else 'max'
 
-    if args.verbose: table = [["No.", "Video", "F-score"]]
-
-    if args.save_results:
-        h5_res = h5py.File(osp.join(args.save_dir, 'result.h5'), 'w')
-
-    for key_idx, key in enumerate(test_keys):
-        seq = dataset[key]['features'][...]
-        seq = torch.from_numpy(seq).unsqueeze(0)
-        if use_gpu: seq = seq.cuda()
-        seq = Variable(seq)
-        probs = model(seq)
-        probs = probs.data.cpu().squeeze().numpy()
-
-        cps = dataset[key]['change_points'][...]
-        num_frames = dataset[key]['n_frames'][()]
-        nfps = dataset[key]['n_frame_per_seg'][...].tolist()
-        positions = dataset[key]['picks'][...]
-        user_summary = dataset[key]['user_summary'][...]
-
-        machine_summary = vsum_tools.generate_summary(probs, cps, num_frames, nfps, positions)
-        fm, _, _ = vsum_tools.evaluate_summary(machine_summary, user_summary, eval_metric)
-        fms.append(fm)
-
-        if args.verbose:
-            table.append([key_idx+1, key, "{:.1%}".format(fm)])
+        if args.verbose: table = [["No.", "Video", "F-score"]]
 
         if args.save_results:
-            h5_res.create_dataset(key + '/score', data=probs)
-            h5_res.create_dataset(key + '/machine_summary', data=machine_summary)
-            h5_res.create_dataset(key + '/gtscore', data=dataset[key]['gtscore'][...])
-            h5_res.create_dataset(key + '/fm', data=fm)
+            h5_res = h5py.File(osp.join(args.save_dir, 'result.h5'), 'w')
+
+        for key_idx, key in enumerate(test_keys):
+            seq = dataset[key]['features'][...]
+            seq = torch.from_numpy(seq).unsqueeze(0)
+            if use_gpu: seq = seq.cuda()
+            probs = model(seq)
+            probs = probs.data.cpu().squeeze().numpy()
+
+            cps = dataset[key]['change_points'][...]
+            num_frames = dataset[key]['n_frames'][()]
+            nfps = dataset[key]['n_frame_per_seg'][...].tolist()
+            positions = dataset[key]['picks'][...]
+            user_summary = dataset[key]['user_summary'][...]
+
+            machine_summary = vsum_tools.generate_summary(probs, cps, num_frames, nfps, positions)
+            fm, _, _ = vsum_tools.evaluate_summary(machine_summary, user_summary, eval_metric)
+            fms.append(fm)
+
+            if args.verbose:
+                table.append([key_idx+1, key, "{:.1%}".format(fm)])
+
+            if args.save_results:
+                h5_res.create_dataset(key + '/score', data=probs)
+                h5_res.create_dataset(key + '/machine_summary', data=machine_summary)
+                h5_res.create_dataset(key + '/gtscore', data=dataset[key]['gtscore'][...])
+                h5_res.create_dataset(key + '/fm', data=fm)
 
     if args.verbose:
         print(tabulate(table))
