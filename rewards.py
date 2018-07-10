@@ -15,11 +15,11 @@ def compute_reward(seq, actions, ignore_far_sim=True, temp_dist_thre=20, use_gpu
     _seq = seq.detach()
     _actions = actions.detach()
     pick_idxs = _actions.squeeze().nonzero().squeeze()
-    num_picks = len(pick_idxs)
+    num_picks = len(pick_idxs) if pick_idxs.ndimension() > 0 else 1
     
     if num_picks == 0:
         # give zero reward is no frames are selected
-        reward = torch.tensor([0.])
+        reward = torch.tensor(0.)
         if use_gpu: reward = reward.cuda()
         return reward
 
@@ -28,7 +28,7 @@ def compute_reward(seq, actions, ignore_far_sim=True, temp_dist_thre=20, use_gpu
 
     # compute diversity reward
     if num_picks == 1:
-        reward_div = torch.tensor([0.])
+        reward_div = torch.tensor(0.)
         if use_gpu: reward_div = reward_div.cuda()
     else:
         normed_seq = _seq / _seq.norm(p=2, dim=1, keepdim=True)
