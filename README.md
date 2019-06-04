@@ -77,6 +77,7 @@ We preprocess data by extracting image features for videos and save them to `h5`
 1. Edit README
 2. Reconstruct Repository
 3. Add KTS(Kernel Temporal Segmentation)
+4. Edit code for test
 
 ## Citation
 ```
