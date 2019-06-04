@@ -1,6 +1,6 @@
 # ============ TRAIN CONFIG ==============
 # Dataset options
-DATASET = 'summe_dataset.h5' # path to h5 dataset (required)
+DATASET = 'datasets/eccv16_dataset_summe_google_pool5.h5' # path to h5 dataset (required)
 SPLIT = 'datasets/summe_splits.json' # path to split file (required)
 SPLIT_ID = 0 # split index (default: 0)
 METRIC = 'summe' # evaluation metric ['tvsum', 'summe'])
@@ -25,7 +25,7 @@ SEED = 1 # random seed (default: 1)
 GPU = '0' # which gpu devices to use (default: 0)
 USE_CPU = False # use cpu device
 EVALUATE = False # whether to do evaluation only
-TEST = True # whether to do evaluation only
+TEST = False # whether to do evaluation only
 RESUME = False # path to resume file
 VERBOSE = True # whether to show detailed test results
 SAVE_DIR = 'log/summe-split0' # path to save output (default: log/)
