@@ -25,13 +25,23 @@ As a result, the dataset is randomly split for 5 times, which are saved as json 
 Train and test codes are written in `main.py`. To see the detailed arguments, please do `python main.py -h`.
 
 ## How to train
+* Edit config/config.py ( see config/README.txt )
+
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --verbose
+python video_summarization.py
+```
+## How to evaluate
+* Edit config/config.py ( see config/README.txt )
+
+```bash
+python video_summarization.py
 ```
 
 ## How to test
+* Edit config/config.py ( see config/README.txt )
+
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar --verbose --save-results
+python video_summarization.py
 ```
 
 If argument `--save-results` is enabled, output results will be saved to `results.h5` under the same folder specified by `--save-dir`. To visualize the score-vs-gtscore, simple do
