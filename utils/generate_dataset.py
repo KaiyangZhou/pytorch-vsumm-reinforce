@@ -101,7 +101,6 @@ class Generate_Dataset:
             for frame_idx in tqdm(range(n_frames-1)):
                 success, frame = video_capture.read()
                 if success:
-                    frame_list.append(frame)
                     frame_feat = self._extract_feature(frame)
 
                     if frame_idx % 15 == 0:
