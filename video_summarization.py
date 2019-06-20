@@ -41,12 +41,15 @@ def main():
     print("Initialize dataset {}".format(config.DATASET))
     dataset = h5py.File(config.DATASET, 'r')
     num_videos = len(dataset.keys())
+
     splits = read_json(config.SPLIT)
-    assert config.SPLIT_ID < len(splits), "split_id (got {}) exceeds {}".format(config.SPLIT_ID, len(splits ))
-    split = splits[config.SPLIT_ID]
-    train_keys = split["train_keys"]
-    test_keys = split["test_keys"]
-    print("# total videos {}. # train videos {}. # test videos {}.".format(num_videos, len(train_keys), len(test_keys)))
+
+    if not config.TEST:
+        assert config.SPLIT_ID < len(splits), "split_id (got {}) exceeds {}".format(config.SPLIT_ID, len(splits ))
+        split = splits[config.SPLIT_ID]
+        train_keys = split["train_keys"]
+        test_keys = split["test_keys"]
+        print("# total videos {}. # train videos {}. # test videos {}.".format(num_videos, len(train_keys), len(test_keys)))
 
     print("Initialize model")
     model = DSN(in_dim=config.INPUT_DIM, hid_dim=config.HIDDEN_DIM, num_layers = config.NUM_LAYERS, cell=config.RNN_CELL)
@@ -68,7 +71,7 @@ def main():
 
     if config.TEST:
         print("Test only")
-        test(model, dataset, ['video_0'], use_gpu)
+        test(model, dataset, ['video_1'], use_gpu)
         return
 
 
@@ -205,8 +208,7 @@ def test(model, dataset, test_data, use_gpu):
 
             cps = dataset[key]['change_points'][...]
             num_frames = dataset[key]['n_frames'][...]
-            nfps = dataset[key]['n_frame_per_seg'][...]
-            nfps = [65, 2159]
+            nfps = dataset[key]['n_frame_per_seg'][...].tolist()
             positions = dataset[key]['picks'][...]
 
             machine_summary = vsum_tool.generate_summary(probs, cps, num_frames, nfps,positions)
