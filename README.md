@@ -22,6 +22,11 @@ cd pytorch-vsumm-reinforce
 wget http://www.eecs.qmul.ac.uk/~kz303/vsumm-reinforce/datasets.tar.gz
 tar -xvzf datasets.tar.gz
 ```
+* If can't download, open following link.(I loaded same dataset in my onedrive)
+```
+https://onedrive.live.com/?authkey=%21AO1tsqjDVCeakGg&cid=6FD3437627D709EE&id=6FD3437627D709EE%212809&parId=root&action=locate
+```
+
 2. Make splits
 ```bash
 python create_split.py -d datasets/eccv16_dataset_summe_google_pool5.h5 --save-dir datasets --save-name summe_splits  --num-splits 5
