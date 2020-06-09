@@ -7,6 +7,12 @@ This repo contains the Pytorch implementation of the AAAI'18 paper - [Deep Reinf
 
 The main requirements are [pytorch](http://pytorch.org/) (`v0.4.0`) and python `2.7`. Some dependencies that may not be installed in your machine are [tabulate](https://pypi.org/project/tabulate/) and [h5py](https://github.com/h5py/h5py). Please install other missing dependencies.
 
+## TODO
+1. Edit README
+2. Reconstruct Repository
+3. ~~Add KTS(Kernel Temporal Segmentation)~~
+4. Edit code for test
+
 ## Get started
 1. Download preprocessed datasets
 ```bash
@@ -16,6 +22,11 @@ cd pytorch-vsumm-reinforce
 wget http://www.eecs.qmul.ac.uk/~kz303/vsumm-reinforce/datasets.tar.gz
 tar -xvzf datasets.tar.gz
 ```
+* If can't download, open following link.(I loaded same dataset in my onedrive)
+```
+https://onedrive.live.com/?authkey=%21AO1tsqjDVCeakGg&cid=6FD3437627D709EE&id=6FD3437627D709EE%212809&parId=root&action=locate
+```
+
 2. Make splits
 ```bash
 python create_split.py -d datasets/eccv16_dataset_summe_google_pool5.h5 --save-dir datasets --save-name summe_splits  --num-splits 5
@@ -25,13 +36,23 @@ As a result, the dataset is randomly split for 5 times, which are saved as json 
 Train and test codes are written in `main.py`. To see the detailed arguments, please do `python main.py -h`.
 
 ## How to train
+* Edit config/config.py ( see config/README.txt )
+
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --verbose
+python video_summarization.py
+```
+## How to evaluate
+* Edit config/config.py ( see config/README.txt )
+
+```bash
+python video_summarization.py
 ```
 
 ## How to test
+* Edit config/config.py ( see config/README.txt )
+
 ```bash
-python main.py -d datasets/eccv16_dataset_summe_google_pool5.h5 -s datasets/summe_splits.json -m summe --gpu 0 --save-dir log/summe-split0 --split-id 0 --evaluate --resume path_to_your_model.pth.tar --verbose --save-results
+python video_summarization.py
 ```
 
 If argument `--save-results` is enabled, output results will be saved to `results.h5` under the same folder specified by `--save-dir`. To visualize the score-vs-gtscore, simple do
@@ -72,6 +93,7 @@ Please remember to specify the naming format of your video frames on this [line]
 
 ## How to use your own data
 We preprocess data by extracting image features for videos and save them to `h5` file. The file format looks like [this](https://github.com/KaiyangZhou/vsumm-reinforce/issues/1#issuecomment-363492711). After that, you can make split via `create_split.py`. If you wanna train policy network using the entire dataset, just do `train_keys = dataset.keys()`. [Here](https://github.com/KaiyangZhou/pytorch-vsumm-reinforce/blob/master/main.py#L75) is the code where we initialize dataset. If you have any problems, feel free to contact me by email or raise an `issue`.
+
 
 ## Citation
 ```

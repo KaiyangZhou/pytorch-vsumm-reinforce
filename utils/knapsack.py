@@ -28,8 +28,8 @@ def knapsack_dp(values,weights,n_items,capacity,return_all=False):
     table = np.zeros((n_items+1,capacity+1),dtype=np.float32)
     keep = np.zeros((n_items+1,capacity+1),dtype=np.float32)
 
-    for i in xrange(1,n_items+1):
-        for w in xrange(0,capacity+1):
+    for i in range(1,n_items+1):
+        for w in range(0,capacity+1):
             wi = weights[i-1] # weight of current item
             vi = values[i-1] # value of current item
             if (wi <= w) and (vi + table[i-1,w-wi] > table[i-1,w]):
@@ -41,7 +41,7 @@ def knapsack_dp(values,weights,n_items,capacity,return_all=False):
     picks = []
     K = capacity
 
-    for i in xrange(n_items,0,-1):
+    for i in range(n_items,0,-1):
         if keep[i,K] == 1:
             picks.append(i)
             K -= weights[i-1]
@@ -54,7 +54,7 @@ def knapsack_dp(values,weights,n_items,capacity,return_all=False):
         return picks,max_val
     return picks
 
-def check_inputs(values,weights,n_items,capacity):
+def check_inputs(values, weights, n_items, capacity):
     # check variable type
     assert(isinstance(values,list))
     assert(isinstance(weights,list))
@@ -74,4 +74,4 @@ if __name__ == '__main__':
     n_items = 3
     capacity = 3
     picks = knapsack_dp(values,weights,n_items,capacity)
-    print picks
+    print (picks)

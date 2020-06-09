@@ -1,8 +1,6 @@
 import h5py
 import cv2
 import os
-import os.path as osp
-import numpy as np
 import argparse
 
 parser = argparse.ArgumentParser()
@@ -22,16 +20,16 @@ def frm2video(frm_dir, summary, vid_writer):
             # here frame name starts with '000001.jpg'
             # change according to your need
             frm_name = str(idx+1).zfill(6) + '.jpg'
-            frm_path = osp.join(frm_dir, frm_name)
+            frm_path = os.path.join(frm_dir, frm_name)
             frm = cv2.imread(frm_path)
             frm = cv2.resize(frm, (args.width, args.height))
             vid_writer.write(frm)
 
 if __name__ == '__main__':
-    if not osp.exists(args.save_dir):
+    if not os.path.exists(args.save_dir):
         os.mkdir(args.save_dir)
     vid_writer = cv2.VideoWriter(
-        osp.join(args.save_dir, args.save_name),
+        os.path.join(args.save_dir, args.save_name),
         cv2.VideoWriter_fourcc(*'MP4V'),
         args.fps,
         (args.width, args.height),

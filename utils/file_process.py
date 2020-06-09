@@ -1,26 +1,25 @@
-from __future__ import absolute_import
-import os
-import sys
-import errno
-import shutil
+import sys, os
 import json
-import os.path as osp
-
 import torch
 
-def mkdir_if_missing(directory):
-    if not osp.exists(directory):
-        try:
-            os.makedirs(directory)
-        except OSError as e:
-            if e.errno != errno.EEXIST:
-                raise
+def write_json(splits, save_path):
+    if not os.path.exists(os.path.dirname(save_path)):
+        os.mkdir(os.path.dirname(save_path))
+
+    with open(save_path, 'w') as f:
+        json.dump(splits, f, indent=4, separators=(', ', ': '))
+
+def read_json(fpath):
+    with open(fpath, 'r') as f:
+        obj = json.load(f)
+    return obj
 
 class AverageMeter(object):
     """Computes and stores the average and current value.
-       
+
        Code imported from https://github.com/pytorch/examples/blob/master/imagenet/main.py#L247-L262
     """
+
     def __init__(self):
         self.reset()
 
@@ -36,20 +35,27 @@ class AverageMeter(object):
         self.count += n
         self.avg = self.sum / self.count
 
+
 def save_checkpoint(state, fpath='checkpoint.pth.tar'):
-    mkdir_if_missing(osp.dirname(fpath))
+    if not os.path.exists(os.path.dirname(fpath)):
+        os.mkdir(os.path.dirname(fpath))
+
     torch.save(state, fpath)
+
 
 class Logger(object):
     """
     Write console output to external text file.
     Code imported from https://github.com/Cysu/open-reid/blob/master/reid/utils/logging.py.
     """
+
     def __init__(self, fpath=None):
         self.console = sys.stdout
         self.file = None
         if fpath is not None:
-            mkdir_if_missing(os.path.dirname(fpath))
+            if not os.path.exists(os.path.dirname(fpath)):
+                os.mkdir(os.path.dirname(fpath))
+
             self.file = open(fpath, 'w')
 
     def __del__(self):
@@ -76,19 +82,4 @@ class Logger(object):
         self.console.close()
         if self.file is not None:
             self.file.close()
-
-def read_json(fpath):
-    with open(fpath, 'r') as f:
-        obj = json.load(f)
-    return obj
-
-def write_json(obj, fpath):
-    mkdir_if_missing(osp.dirname(fpath))
-    with open(fpath, 'w') as f:
-        json.dump(obj, f, indent=4, separators=(',', ': '))
-
-
-
-
-
 
