@@ -6,6 +6,7 @@ import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
 from utils import read_json
+import numpy as np
 
 """
 Parse json file (.json) to extract rewards for specific videos.
@@ -14,6 +15,13 @@ How to use:
 # image will be saved in path: blah_blah_blah
 $ python parse_json.py -p blah_blah_blah/rewards.json -i 0
 """
+
+# Rewards in RL are typically have a high variance,
+# so it's better to smooth them out for better analysis
+def movingaverage(values, window):
+    weights = np.repeat(1.0, window)/window
+    sma = np.convolve(values, weights, 'valid')
+    return sma
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', type=str, required=True, help="path to rewards.json; output saved to the same dir")
@@ -25,6 +33,9 @@ keys = reward_writers.keys()
 assert args.idx < len(keys)
 key = keys[args.idx]
 rewards = reward_writers[key]
+
+rewards = np.array(rewards)
+rewards = movingaverage(rewards, 8)
 
 plt.plot(rewards)
 plt.xlabel('epoch')

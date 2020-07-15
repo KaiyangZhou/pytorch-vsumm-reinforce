@@ -5,6 +5,7 @@ import os.path as osp
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot as plt
+import numpy as np
 
 """
 Parse log file (.txt) to extract rewards.
@@ -13,6 +14,13 @@ How to use:
 # image will be saved in path: blah_blah_blah
 $ python parse_log.py -p blah_blah_blah/log_train.txt
 """
+
+# Rewards in RL are typically have a high variance,
+# so it's better to smooth them out for better analysis
+def movingaverage(values, window):
+    weights = np.repeat(1.0, window)/window
+    sma = np.convolve(values, weights, 'valid')
+    return sma
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-p', '--path', type=str, required=True, help="path to log.txt; output saved to the same dir")
@@ -34,6 +42,9 @@ with open(args.path, 'r') as f:
         if reward_match:
             reward = float(reward_match.group(1))
             rewards.append(reward)
+
+rewards = np.array(rewards)
+rewards = movingaverage(rewards, 8)
 
 plt.plot(rewards)
 plt.xlabel('epoch')
