@@ -74,4 +74,4 @@ if __name__ == '__main__':
     n_items = 3
     capacity = 3
     picks = knapsack_dp(values,weights,n_items,capacity)
-    print picks
+    print(picks)
