@@ -16,6 +16,9 @@ cd pytorch-vsumm-reinforce
 wget http://www.eecs.qmul.ac.uk/~kz303/vsumm-reinforce/datasets.tar.gz
 tar -xvzf datasets.tar.gz
 ```
+
+**Updates**: The QMUL server is inaccessible. Download the datasets from this [google drive linke](https://drive.google.com/open?id=1Bf0beMN_ieiM3JpprghaoOwQe9QJIyAN).
+
 2. Make splits
 ```bash
 python create_split.py -d datasets/eccv16_dataset_summe_google_pool5.h5 --save-dir datasets --save-name summe_splits  --num-splits 5
