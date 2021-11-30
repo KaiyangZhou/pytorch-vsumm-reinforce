@@ -17,7 +17,7 @@ wget http://www.eecs.qmul.ac.uk/~kz303/vsumm-reinforce/datasets.tar.gz
 tar -xvzf datasets.tar.gz
 ```
 
-**Updates**: The QMUL server is inaccessible. Download the datasets from this [google drive linke](https://drive.google.com/open?id=1Bf0beMN_ieiM3JpprghaoOwQe9QJIyAN).
+**Updates**: The QMUL server is inaccessible. Download the datasets from this [google drive link](https://drive.google.com/open?id=1Bf0beMN_ieiM3JpprghaoOwQe9QJIyAN).
 
 2. Make splits
 ```bash
